@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 
-type CallStatus = 'idle' | 'calling' | 'ringing' | 'in_call'
+type CallStatus = 'idle' | 'in_chat'
 
 function App() {
   const urlParams = new URLSearchParams(window.location.search)
-  const userId = urlParams.get("user") || "user1" // ?user=user1 or ?user=user2
+  const userId = urlParams.get("user") || "user1"
   const targetId = userId === "user1" ? "user2" : "user1"
 
   const [status, setStatus] = useState<CallStatus>('idle')
   const [log, setLog] = useState<string[]>([])
+  const [message, setMessage] = useState('')
   const ws = useRef<WebSocket | null>(null)
 
   useEffect(() => {
@@ -19,16 +20,11 @@ function App() {
       const data = JSON.parse(event.data)
       const action = data.action
       const from = data.from
+      const content = data.message
 
-      if (action === "incoming_call") {
-        setStatus("ringing")
-        logMessage(`📞 Incoming call from ${from}`)
-      } else if (action === "call_accepted") {
-        setStatus("in_call")
-        logMessage(`✅ Call accepted by ${from}`)
-      } else if (action === "call_ended") {
-        setStatus("idle")
-        logMessage(`❌ Call ended by ${from}`)
+      if (action === "chat_message") {
+        setStatus("in_chat")
+        logMessage(`💬 ${from}: ${content}`)
       }
     }
 
@@ -39,50 +35,34 @@ function App() {
     setLog(prev => [...prev, msg])
   }
 
-  const callUser = () => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
+  const sendMessage = () => {
+    if (ws.current?.readyState === WebSocket.OPEN && message.trim()) {
       ws.current.send(JSON.stringify({
-        action: "call_user",
-        target: targetId
+        action: "chat_message",
+        target: targetId,
+        message: message.trim()
       }))
-      setStatus("calling")
-      logMessage(`📤 Calling ${targetId}...`)
-    }
-  }
-
-  const acceptCall = () => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({
-        action: "accept_call",
-        target: targetId
-      }))
-      setStatus("in_call")
-      logMessage(`📥 Accepted call from ${targetId}`)
-    }
-  }
-
-  const endCall = () => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({
-        action: "end_call",
-        target: targetId
-      }))
-      setStatus("idle")
-      logMessage(`🔚 Ended call with ${targetId}`)
+      logMessage(`📤 You: ${message.trim()}`)
+      setMessage('')
+      setStatus("in_chat")
     }
   }
 
   return (
     <div style={{ padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h2>Audio Call App</h2>
+      <h2>Text Chat App</h2>
       <p><strong>You are:</strong> {userId}</p>
       <p><strong>Talking to:</strong> {targetId}</p>
       <p><strong>Status:</strong> {status}</p>
 
-      {status === 'idle' && <button onClick={callUser}>📞 Call {targetId}</button>}
-      {status === 'ringing' && <button onClick={acceptCall}>✅ Accept Call</button>}
-      {status === 'in_call' && <button onClick={endCall}>❌ End Call</button>}
-      {status === 'calling' && <button onClick={endCall}>❌ Cancel Call</button>}
+      <input
+        type="text"
+        placeholder="Type your message..."
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+        style={{ width: '80%', marginRight: '1rem' }}
+      />
+      <button onClick={sendMessage} disabled={!message.trim()}>Send</button>
 
       <hr />
       <h4>Logs:</h4>
