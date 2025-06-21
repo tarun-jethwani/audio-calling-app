@@ -1,6 +1,6 @@
-# Audio Calling App
+# Audio Calling App (Text Chat Foundation)
 
-This project is an audio calling application built using Python for the backend and a modern TypeScript framework for the frontend. The application allows users to initiate and manage audio calls with a simple interface.
+This project began as an audio calling application but currently features a working **text-based chat** system between two users. The goal is to evolve it into a multi-user audio calling platform, similar to WhatsApp. As a foundational step, text chat enables communication logging, status signaling, and easier debugging.
 
 ## Project Structure
 
@@ -8,81 +8,68 @@ This project is an audio calling application built using Python for the backend 
 audio-calling-app
 ├── backend
 │   ├── src
-│   │   ├── app.py                # Main entry point for the backend application
-│   │   ├── audio
-│   │   │   └── __init__.py       # Logic for handling audio calls
-│   │   └── utils
-│   │       └── __init__.py       # Utility functions for the backend
+│   │   ├── app.py                # Main WebSocket-based backend logic
 │   ├── requirements.txt           # Python dependencies for the backend
-│   ├── Dockerfile                  # Dockerfile for building the backend image
+│   ├── Dockerfile                 # Dockerfile for building the backend image
 │   └── README.md                  # Documentation for the backend
 ├── frontend
 │   ├── src
-│   │   ├── components
-│   │   │   ├── CallButton.tsx     # Component for initiating a call
-│   │   │   ├── Status.tsx         # Component for displaying call status
-│   │   │   └── EndCallButton.tsx  # Component for ending a call
-│   │   ├── App.tsx                # Main component of the frontend application
-│   │   └── index.tsx              # Entry point for the React application
+│   │   ├── App.tsx                # Main React UI for chat
+│   │   └── index.tsx              # Entry point
 │   ├── public
-│   │   └── index.html             # Main HTML file for the frontend
-│   ├── package.json               # Configuration file for npm
-│   ├── tsconfig.json              # TypeScript configuration file
-│   └── README.md                  # Documentation for the frontend
+│   │   └── index.html             # HTML file for the frontend
+│   ├── package.json               # npm configuration
+│   ├── tsconfig.json              # TypeScript config
+│   └── README.md                  # Frontend documentation
 ├── infra
-│   ├── docker-compose.yml          # Docker orchestration file
-│   ├── aws-cdk
-│   │   └── app.py                 # AWS CDK application code for deployment
-│   └── README.md                  # Documentation for infrastructure setup
-└── README.md                      # Overview of the entire project
+│   ├── docker-compose.yml         # Docker orchestration for backend + frontend
+│   └── README.md                  # Infra setup instructions
+└── README.md                      # Root overview (this file)
 ```
 
-## Setup Instructions
+## Setup Instructions (Feature: Text Messaging via WebSocket)
 
-### Backend
+### Prerequisites
+- Docker + Docker Compose
+- Browser access (user1 and user2 can be opened in different tabs or browsers like Chrome and Edge)
 
-1. Navigate to the `backend` directory.
-2. Install the required Python packages:
-   ```
-   pip install -r requirements.txt
-   ```
-3. Build the Docker image:
-   ```
-   docker build -t audio-calling-backend .
-   ```
-4. Run the Docker container:
-   ```
-   docker run -p 5000:5000 audio-calling-backend
+### Step-by-Step Guide
+
+1. Clone the repository and switch to the feature branch:
+   ```sh
+   git clone https://github.com/tarun-jethwani/audio-calling-app.git
+   cd audio-calling-app
+   git checkout feature/using-text-messages-as-communication
    ```
 
-### Frontend
-
-1. Navigate to the `frontend` directory.
-2. Install the required npm packages:
-   ```
-   npm install
-   ```
-3. Start the development server:
-   ```
-   npm start
+2. Build and start the full app using Docker Compose:
+   ```sh
+   docker-compose up --build
    ```
 
-### Infrastructure
+3. Open two browser windows:
+   - Chrome: [http://localhost:3000/?user=user1](http://localhost:3000/?user=user1)
+   - Edge: [http://localhost:3000/?user=user2](http://localhost:3000/?user=user2)
 
-1. Navigate to the `infra` directory.
-2. Deploy the infrastructure using AWS CDK:
-   ```
-   cdk deploy
-   ```
+4. Start chatting! Messages are relayed via WebSocket through the FastAPI backend.
 
-## Usage
+## Feature Summary
 
-- Use the frontend interface to initiate and manage audio calls.
-- The backend handles the audio call logic and state management.
+- Text messaging between two users using WebSockets.
+- Chat logs are maintained locally in each session.
+- Message logs can double as **status indicators and debugging trails** for future communication events (e.g., call initiated, rejected, etc.).
 
-## Architecture
+## Architecture Diagram
 
-The application is designed with a microservices architecture, utilizing Docker for containerization and AWS for deployment. The frontend communicates with the backend via RESTful APIs, ensuring a seamless user experience.
+```
+[user1] <--> |                 |
+             |  FastAPI       |
+[user2] <--> |  Backend (WS)  | <--> Docker Compose
+             |                 |
+                |       |
+                v       v
+          [Frontend]  [Backend]
+```
 
 ## License
 
