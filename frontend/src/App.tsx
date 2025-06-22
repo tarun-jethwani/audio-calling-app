@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-type CallStatus = 'idle' | 'calling' | 'ringing' | 'in_call' | 'in_chat'
+type CallStatus = 'idle' | 'calling' | 'ringing' | 'in_call'
 
 function App() {
   const urlParams = new URLSearchParams(window.location.search)
@@ -18,9 +18,13 @@ function App() {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      const { action, from, message: content } = data
+      const action = data.action
+      const from = data.from
+      const content = data.message
 
-      if (action === "incoming_call") {
+      if (action === "chat_message") {
+        logMessage(`💬 ${from}: ${content}`)
+      } else if (action === "incoming_call") {
         setStatus("ringing")
         logMessage(`📞 Incoming call from ${from}`)
       } else if (action === "call_accepted") {
@@ -29,9 +33,6 @@ function App() {
       } else if (action === "call_ended") {
         setStatus("idle")
         logMessage(`❌ Call ended by ${from}`)
-      } else if (action === "chat_message") {
-        setStatus("in_chat")
-        logMessage(`💬 ${from}: ${content}`)
       }
     }
 
@@ -51,21 +52,10 @@ function App() {
       }))
       logMessage(`📤 You: ${message.trim()}`)
       setMessage('')
-      setStatus("in_chat")
     }
   }
 
-  const requestMicAccess = async () => {
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true })
-      logMessage("🎤 Microphone access granted")
-    } catch (err) {
-      logMessage("🚫 Microphone access denied")
-    }
-  }
-
-  const callUser = async () => {
-    await requestMicAccess()
+  const callUser = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify({
         action: "call_user",
@@ -100,19 +90,12 @@ function App() {
 
   return (
     <div style={{ padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h2>Chat + Audio App</h2>
+      <h2>Chat + Call App</h2>
       <p><strong>You are:</strong> {userId}</p>
       <p><strong>Talking to:</strong> {targetId}</p>
       <p><strong>Status:</strong> {status}</p>
 
-      {/* Call Controls */}
-      {status === 'idle' && <button onClick={callUser}>📞 Call {targetId}</button>}
-      {status === 'ringing' && <button onClick={acceptCall}>✅ Accept Call</button>}
-      {(status === 'in_call' || status === 'calling') &&
-        <button onClick={endCall}>❌ {status === 'in_call' ? 'End Call' : 'Cancel Call'}</button>}
-
-      {/* Chat Input */}
-      <div style={{ marginTop: '1rem' }}>
+      <div style={{ marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Type your message..."
@@ -123,7 +106,16 @@ function App() {
         <button onClick={sendMessage} disabled={!message.trim()}>Send</button>
       </div>
 
-      {/* Logs */}
+      {status === 'idle' && <button onClick={callUser}>📞 Call {targetId}</button>}
+      {status === 'calling' && <button onClick={endCall}>❌ Cancel Call</button>}
+      {status === 'ringing' && (
+        <>
+          <button onClick={acceptCall}>✅ Accept Call</button>
+          <button onClick={endCall}>❌ Cancel Call</button>
+        </>
+      )}
+      {status === 'in_call' && <button onClick={endCall}>❌ End Call</button>}
+
       <hr />
       <h4>Logs:</h4>
       <ul>

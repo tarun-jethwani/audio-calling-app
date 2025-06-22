@@ -3,18 +3,20 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Allow frontend on localhost to connect (relaxed for dev)
+# Allow frontend on localhost to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Don't use '*' in prod
+    allow_origins=["*"],  # For dev only
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Store connected users and their call status
+# Store connected users
 connected_users: dict[str, WebSocket] = {}
-user_status: dict[str, str] = {}  # e.g., "idle", "calling", "ringing", "in_call"
+
+# Track call status per user
+user_status: dict[str, str] = {}  # idle, calling, ringing, in_call
 
 @app.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: str):
@@ -28,10 +30,9 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
             data = await websocket.receive_json()
             action = data.get("action")
             target = data.get("target")
-            message = data.get("message")
+            message = data.get("message", "")
 
-            # Handle text chat
-            if action == "chat_message" and target and message:
+            if action == "chat_message":
                 if target in connected_users:
                     await connected_users[target].send_json({
                         "action": "chat_message",
@@ -39,8 +40,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                         "message": message
                     })
 
-            # Handle call request
-            elif action == "call_user" and target:
+            elif action == "call_user":
                 user_status[user_id] = "calling"
                 user_status[target] = "ringing"
                 if target in connected_users:
@@ -49,8 +49,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                         "from": user_id
                     })
 
-            # Handle call acceptance
-            elif action == "accept_call" and target:
+            elif action == "accept_call":
                 user_status[user_id] = "in_call"
                 user_status[target] = "in_call"
                 if target in connected_users:
@@ -59,13 +58,21 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                         "from": user_id
                     })
 
-            # Handle end/cancel call
-            elif action == "end_call" and target:
+            elif action == "end_call":
                 user_status[user_id] = "idle"
                 user_status[target] = "idle"
                 if target in connected_users:
                     await connected_users[target].send_json({
                         "action": "call_ended",
+                        "from": user_id
+                    })
+
+            elif action == "cancel_call":
+                user_status[user_id] = "idle"
+                user_status[target] = "idle"
+                if target in connected_users:
+                    await connected_users[target].send_json({
+                        "action": "call_cancelled",
                         "from": user_id
                     })
 
