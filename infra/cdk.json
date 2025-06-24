@@ -1,0 +1,6 @@
+{
+  "app": "python aws-cdk/app.py",
+  "context": {
+    "@aws-cdk/aws-apprunner-alpha:useServiceConnect": true
+  }
+}

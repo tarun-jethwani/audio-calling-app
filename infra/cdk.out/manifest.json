@@ -1,0 +1,172 @@
+{
+  "version": "44.0.0",
+  "artifacts": {
+    "AudioCallingAppStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "AudioCallingAppStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "AudioCallingAppStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "AudioCallingAppStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/7bc72b8aa44144c6a24a7823e64727102a444d1662d6112e82eae4ed21e0b263.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "AudioCallingAppStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "AudioCallingAppStack.assets"
+      ],
+      "metadata": {
+        "/AudioCallingAppStack/FrontendBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketEFE2E19C"
+          }
+        ],
+        "/AudioCallingAppStack/FrontendBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketPolicy1DFF75D9"
+          }
+        ],
+        "/AudioCallingAppStack/DeployFrontend/AwsCliLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeployFrontendAwsCliLayerD774ED8F"
+          }
+        ],
+        "/AudioCallingAppStack/DeployFrontend/CustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeployFrontendCustomResource3E02C3B7"
+          }
+        ],
+        "/AudioCallingAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-singleton",
+            "data": true
+          },
+          {
+            "type": "aws:cdk:is-custom-resource-handler-runtime-family",
+            "data": 2
+          }
+        ],
+        "/AudioCallingAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+          }
+        ],
+        "/AudioCallingAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF"
+          }
+        ],
+        "/AudioCallingAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536"
+          }
+        ],
+        "/AudioCallingAppStack/FrontendCDN/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendCDNF4E135DE"
+          }
+        ],
+        "/AudioCallingAppStack/AppRunnerService/InstanceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AppRunnerServiceInstanceRole1527418E"
+          }
+        ],
+        "/AudioCallingAppStack/AppRunnerService/InstanceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AppRunnerServiceInstanceRoleDefaultPolicy01AB01BA"
+          }
+        ],
+        "/AudioCallingAppStack/AppRunnerService/AccessRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AppRunnerServiceAccessRole7E5F165D"
+          }
+        ],
+        "/AudioCallingAppStack/AppRunnerService/AccessRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AppRunnerServiceAccessRoleDefaultPolicy4B9FACB5"
+          }
+        ],
+        "/AudioCallingAppStack/AppRunnerService/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AppRunnerServiceA852BA10"
+          }
+        ],
+        "/AudioCallingAppStack/FrontendURL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendURL"
+          }
+        ],
+        "/AudioCallingAppStack/BackendURL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BackendURL"
+          }
+        ],
+        "/AudioCallingAppStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/AudioCallingAppStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/AudioCallingAppStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/AudioCallingAppStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "AudioCallingAppStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  },
+  "minimumCliVersion": "2.1019.1"
+}
