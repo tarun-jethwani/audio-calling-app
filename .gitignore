@@ -1,0 +1,61 @@
+# Node modules (frontend)
+frontend/dist/
+
+# Python virtual environment
+.venv/
+__pycache__/
+*.py[cod]
+
+# Python package files
+*.egg-info/
+.eggs/
+*.log
+
+# VS Code settings
+.vscode/
+
+# Environment files
+.env
+.env.*
+
+# Docker
+*.pid
+*.sock
+
+# CDK output and artifacts
+infra/cdk.out/
+cdk.context.json
+
+# Compiled TypeScript
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+*.iml
+
+# Backup files
+*~
+*.swp
+*.bak
+
+# Coverage reports
+htmlcov/
+coverage.xml
+.pytest_cache/
+
+# Test result caches
+.cache/
+.nyc_output/
+
+# Misc
+*.log
+*.tgz
+*.zip
+
+# But keep any requirements.txt
+!requirements.txt
+!*/requirements.txt

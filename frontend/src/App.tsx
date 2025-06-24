@@ -11,6 +11,7 @@ function App() {
   const [log, setLog] = useState<string[]>([])
   const [message, setMessage] = useState('')
   const ws = useRef<WebSocket | null>(null)
+  const localStreamRef = useRef<MediaStream | null>(null)
 
   useEffect(() => {
     const socket = new WebSocket(`ws://localhost:8000/ws/${userId}`)
@@ -30,8 +31,10 @@ function App() {
       } else if (action === "call_accepted") {
         setStatus("in_call")
         logMessage(`✅ Call accepted by ${from}`)
+        startMicrophone()
       } else if (action === "call_ended") {
         setStatus("idle")
+        stopMicrophone()
         logMessage(`❌ Call ended by ${from}`)
       }
     }
@@ -41,6 +44,23 @@ function App() {
 
   const logMessage = (msg: string) => {
     setLog(prev => [...prev, msg])
+  }
+
+  const startMicrophone = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      localStreamRef.current = stream
+      logMessage("🎤 Microphone access granted.")
+    } catch (err) {
+      logMessage("🚫 Microphone access denied.")
+      console.error(err)
+    }
+  }
+
+  const stopMicrophone = () => {
+    localStreamRef.current?.getTracks().forEach(track => track.stop())
+    localStreamRef.current = null
+    logMessage("🎤 Microphone stopped.")
   }
 
   const sendMessage = () => {
@@ -55,8 +75,9 @@ function App() {
     }
   }
 
-  const callUser = () => {
+  const callUser = async () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
+      await startMicrophone()
       ws.current.send(JSON.stringify({
         action: "call_user",
         target: targetId
@@ -66,8 +87,9 @@ function App() {
     }
   }
 
-  const acceptCall = () => {
+  const acceptCall = async () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
+      await startMicrophone()
       ws.current.send(JSON.stringify({
         action: "accept_call",
         target: targetId
@@ -84,6 +106,7 @@ function App() {
         target: targetId
       }))
       setStatus("idle")
+      stopMicrophone()
       logMessage(`🔚 Ended call with ${targetId}`)
     }
   }

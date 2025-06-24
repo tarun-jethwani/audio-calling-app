@@ -1,7 +1,10 @@
+import subprocess
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
 
 # Allow frontend on localhost to connect
 app.add_middleware(
@@ -17,6 +20,14 @@ connected_users: dict[str, WebSocket] = {}
 
 # Track call status per user
 user_status: dict[str, str] = {}  # idle, calling, ringing, in_call
+
+@app.get("/ping")
+def ping():
+    return {
+        "status": "Backend is up and running",
+        "version": "v1.0.0"  # or use os.environ.get("APP_VERSION")
+    }
+
 
 @app.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: str):
